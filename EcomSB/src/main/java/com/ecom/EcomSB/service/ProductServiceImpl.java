@@ -49,6 +49,9 @@ public class ProductServiceImpl implements ProductService{
     @Value("${project.image}") // use in file path
     private String path;
 
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
+
 // todo ::: ----------------------------------- POST METHOD START -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -91,7 +94,11 @@ public class ProductServiceImpl implements ProductService{
 
         List<Product> products = pageProducts.getContent();
         List<ProductDTO> productDTOS = products.stream()
-                .map(pp -> modelMapper.map(pp, ProductDTO.class))
+                .map(product -> {
+                    ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+                    productDTO.setImage(constructImageUrl(product.getImage()));
+                    return productDTO;
+                })
                 .toList();
 
         // if there is no products
@@ -109,6 +116,9 @@ public class ProductServiceImpl implements ProductService{
         return productResponse;
     }
 
+    private String constructImageUrl(String imageName){
+        return imageBaseUrl.endsWith("/") ? imageBaseUrl + imageName : imageBaseUrl+ "/"+imageName;
+    }
 
     @Override
     public ProductResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder){
@@ -233,7 +243,7 @@ public class ProductServiceImpl implements ProductService{
 
         // Upload the Image to server
         // Get the file name of uploaded image
-//        String path = "imagesdir/"; // isko hum application.properties file me hi add kar denge
+//        String path = "images/"; // isko hum application.properties file me hi add kar denge
         String fileName = fileService.uploadImage(path, image); // this method implementation is after this method ending
 
         // Updating new file name to the product

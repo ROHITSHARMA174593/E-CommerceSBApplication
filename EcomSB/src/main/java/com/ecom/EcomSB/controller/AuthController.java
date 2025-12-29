@@ -177,4 +177,15 @@ public class AuthController {
                 .body(new MessageResponse(" !!! You've been SignOut !!!"));
     }
 
+    @GetMapping("/sellers")
+    public ResponseEntity<List<User>> getSellers() {
+        // Fetch all users who have the SELLER role
+        // This is a naive implementation; ideally use a custom query in UserRepository
+        List<User> sellers = userRepository.findAll().stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getRoleName().equals(AppRole.ROLE_SELLER)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(sellers);
+    }
+
 }
