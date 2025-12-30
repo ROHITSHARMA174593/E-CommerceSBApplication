@@ -14,7 +14,7 @@ const Navbar = () => {
     const { user } = useSelector((state) => state.auth);
     
     return (
-        <div className="h-[70px] bg-custom-gradient text-white z-50 flex items-center sticky top-0">
+        <div className="h-[76px] bg-custom-gradient text-white z-50 flex items-center sticky top-0 shadow-lg backdrop-blur-sm">
             <div className="lg:px-14 sm:px-8 px-4 w-full flex justify-between">
                 <Link to="/" className="flex items-center text-2xl font-bold">
                     <FaStore className="mr-2 text-3xl" />

@@ -74,7 +74,9 @@ public class ProductServiceImpl implements ProductService{
             double specialPrice = product.getPrice() - ((product.getDiscount() * 0.01)*product.getPrice());
             product.setSpecialPrice(specialPrice);
             Product savedProduct = productRepository.save(product);
-            return modelMapper.map(savedProduct, ProductDTO.class);
+            ProductDTO responseDTO = modelMapper.map(savedProduct, ProductDTO.class);
+            responseDTO.setImage(constructImageUrl(savedProduct.getImage()));
+            return responseDTO;
         }else {
             throw new APIException(" !!! Product is Alerady Exist !!! ");
         }
@@ -139,7 +141,11 @@ public class ProductServiceImpl implements ProductService{
 
 
         List<ProductDTO> productDTOS = products.stream()
-                .map(pp -> modelMapper.map(pp, ProductDTO.class))
+                .map(pp -> {
+                    ProductDTO productDTO = modelMapper.map(pp, ProductDTO.class);
+                    productDTO.setImage(constructImageUrl(pp.getImage()));
+                    return productDTO;
+                })
                 .toList();
 
         ProductResponse productResponse = new ProductResponse();
@@ -162,7 +168,12 @@ public class ProductServiceImpl implements ProductService{
 
         List<Product> products = pageProducts.getContent();
         List<ProductDTO> productDTOS = products.stream()
-                .map(pp -> modelMapper.map(pp, ProductDTO.class)).toList();
+                .map(pp -> {
+                    ProductDTO productDTO = modelMapper.map(pp, ProductDTO.class);
+                    productDTO.setImage(constructImageUrl(pp.getImage()));
+                    return productDTO;
+                })
+                .toList();
 
         if(products.isEmpty()){
             throw new APIException("Product NOT found with Keyword : "+keyword);
@@ -209,9 +220,9 @@ public class ProductServiceImpl implements ProductService{
             return cartDTO;
         }).toList();
 
-        cartDTOS.forEach(cart -> cartService.updateProductInCarts(cart.getCartId(), productId));
-
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        ProductDTO responseDTO = modelMapper.map(savedProduct, ProductDTO.class);
+        responseDTO.setImage(constructImageUrl(savedProduct.getImage()));
+        return responseDTO;
     }
 // todo ::: ---------------------------------PUT METHOD END-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -229,7 +240,9 @@ public class ProductServiceImpl implements ProductService{
         //todo: Yaha per hum direct ye neeche wali line kar bhi kaam chala sakte hai lekin agar in case ID nahi mili DB me to Error Handling bhi zaroori hai for direct deletion we have a inbuilt method :: deleteById()
         productRepository.delete(product);
 
-        return modelMapper.map(product, ProductDTO.class);
+        ProductDTO responseDTO = modelMapper.map(product, ProductDTO.class);
+        responseDTO.setImage(constructImageUrl(product.getImage()));
+        return responseDTO;
 
     }
 // todo ::: -------------------------------- DELETE METHOD END --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -253,7 +266,9 @@ public class ProductServiceImpl implements ProductService{
         Product updatedProduct = productRepository.save(productFromDB);
 
         // return DTO after Mapping product to DTO
-        return modelMapper.map(updatedProduct, ProductDTO.class);
+        ProductDTO responseDTO = modelMapper.map(updatedProduct, ProductDTO.class);
+        responseDTO.setImage(constructImageUrl(updatedProduct.getImage()));
+        return responseDTO;
     }
 
 // todo ::: -------------------------------- PUT METHOD END --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -73,6 +73,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable())
+                .cors(org.springframework.security.config.Customizer.withDefaults())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -87,6 +88,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()   // <-- Only ONE anyRequest() allowed
                 );
 
@@ -108,7 +110,8 @@ public class WebSecurityConfig {
                 "/swagger-resources/**",
                 "configuration/security",
                 "/swagger-ui.html",
-                "/webjars/**"
+                "/webjars/**",
+                "/images/**"
                 // sprint security filters bypass from these paths(they are not applied in these paths)
         ));
     }
