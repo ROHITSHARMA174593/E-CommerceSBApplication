@@ -1,0 +1,22 @@
+[INFO] Error stacktraces are turned on.
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.ecom:EcomSB >---------------------------
+[INFO] Building EcomSB 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ EcomSB ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ EcomSB ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 75 source files with javac [debug parameters release 17] to target\classes
+[WARNING] /D:/myPCDATA/Projects/EcommerceSpringBoot/EcomSB/src/main/java/com/ecom/EcomSB/service/ProductServiceImpl.java:[98,61] <T>where(org.springframework.data.jpa.domain.Specification<T>) in org.springframework.data.jpa.domain.Specification has been deprecated and marked for removal
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  6.615 s
+[INFO] Finished at: 2026-02-01T11:30:35+05:30
+[INFO] ------------------------------------------------------------------------

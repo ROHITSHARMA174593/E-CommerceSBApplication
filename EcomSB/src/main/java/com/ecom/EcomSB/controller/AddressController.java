@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class AddressController {
 
     @Tag(name = "Address APIs", description = "APIs for Managing Address")
     @GetMapping("/addresses/{addressId}")
-    public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long addressId){
+    public ResponseEntity<AddressDTO> getAddressById(@PathVariable @NonNull Long addressId){
         AddressDTO address = addressService.getAddressById(addressId);
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
@@ -57,7 +58,7 @@ public class AddressController {
     //todo : Update the Address
     @Tag(name = "Address APIs", description = "APIs for Managing Address")
     @PutMapping("/addresses/{addressId}")
-    public ResponseEntity<AddressDTO> updateAddressById(@PathVariable Long addressId, @RequestBody AddressDTO addressDTO){
+    public ResponseEntity<AddressDTO> updateAddressById(@PathVariable @NonNull Long addressId, @RequestBody AddressDTO addressDTO){
         AddressDTO updatedAddress = addressService.updateAddress(addressId, addressDTO);
         return new ResponseEntity<>(updatedAddress, HttpStatus.OK);
     }
@@ -65,7 +66,7 @@ public class AddressController {
     //todo : Delete Address by ID
     @Tag(name = "Address APIs", description = "APIs for Managing Address")
     @DeleteMapping("/addresses/{addressId}")
-    public ResponseEntity<String> deleteAddressById(@PathVariable Long addressId){
+    public ResponseEntity<String> deleteAddressById(@PathVariable @NonNull Long addressId){
         String status = addressService.deleteAddressById(addressId);
         return new ResponseEntity<String>(status, HttpStatus.OK);
     }

@@ -27,7 +27,7 @@ public class OrderController {
 
         OrderDTO orderDTO = orderService.placeOrder(
                 emailId,
-                orderRequestDTO.getAddressId(),
+                java.util.Objects.requireNonNull(orderRequestDTO.getAddressId()),
                 paymentMethod,
                 orderRequestDTO.getPgName(),
                 orderRequestDTO.getPgPaymentId(),

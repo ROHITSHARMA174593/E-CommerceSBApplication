@@ -6,7 +6,7 @@ import com.ecom.EcomSB.exception.ResourceNotFoundException;
 import com.ecom.EcomSB.model.Cart;
 import com.ecom.EcomSB.model.Category;
 import com.ecom.EcomSB.model.Product;
-import com.ecom.EcomSB.payload.CartDTO;
+
 import com.ecom.EcomSB.payload.ProductDTO;
 import com.ecom.EcomSB.payload.ProductResponse;
 import com.ecom.EcomSB.repositories.CartRepository;
@@ -19,11 +19,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.springframework.lang.NonNull;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -54,7 +57,7 @@ public class ProductServiceImpl implements ProductService{
 
 // todo ::: ----------------------------------- POST METHOD START -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
+    public ProductDTO addProduct(@NonNull Long categoryId, ProductDTO productDTO) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryId", categoryId));
 
@@ -87,12 +90,24 @@ public class ProductServiceImpl implements ProductService{
 
 // todo ::: --------------------------------- GET METHOD START --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ProductResponse getAllProducts(String keyword, String category, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable pageDetail = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<Product> pageProducts = productRepository.findAll(pageDetail);
+        Specification<Product> specification = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+        if(keyword != null && !keyword.isEmpty()){
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%"+keyword.toLowerCase()+"%"));
+        }
+
+        if(category != null && !category.isEmpty()){
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("category").get("categoryName"), category));
+        }
+
+
+        Page<Product> pageProducts = productRepository.findAll(specification, pageDetail); // we add JpaSpecificationExecuter in Repository of this model(ProductRepository)
 
         List<Product> products = pageProducts.getContent();
         List<ProductDTO> productDTOS = products.stream()
@@ -123,7 +138,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder){
+    public ProductResponse searchByCategory(@NonNull Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder){
         // First::  Get the Category on this particular ID
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryID", categoryId));
@@ -193,7 +208,7 @@ public class ProductServiceImpl implements ProductService{
 
 // todo ::: -------------------------------------- PUT METHOD START--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public ProductDTO updateProduct(Long productId, ProductDTO productDTO){
+    public ProductDTO updateProduct(@NonNull Long productId, ProductDTO productDTO){
         //1 : Get the products from DB
         Product productFromDB = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productID", productId));
@@ -210,16 +225,6 @@ public class ProductServiceImpl implements ProductService{
         //3: Save to the DB
         Product savedProduct = productRepository.save(productFromDB);
 
-        List<Cart> carts = cartRepository.findCartsByProductId(productId);
-        List<CartDTO> cartDTOS = carts.stream().map(cart -> {
-            CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
-            List<ProductDTO> products = cart.getCartItems().stream()
-                    .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
-                    .toList();
-            cartDTO.setProducts(products);
-            return cartDTO;
-        }).toList();
-
         ProductDTO responseDTO = modelMapper.map(savedProduct, ProductDTO.class);
         responseDTO.setImage(constructImageUrl(savedProduct.getImage()));
         return responseDTO;
@@ -229,7 +234,7 @@ public class ProductServiceImpl implements ProductService{
 
 // todo ::: ------------------------------- DELETE METHOD START---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public ProductDTO deletedProduct(Long productId){
+    public ProductDTO deletedProduct(@NonNull Long productId){
         //1: Get from DB(by ID)
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
@@ -249,7 +254,7 @@ public class ProductServiceImpl implements ProductService{
 
 // todo ::: -------------------------------- PUT METHOD START --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
+    public ProductDTO updateProductImage(@NonNull Long productId, @NonNull MultipartFile image) throws IOException {
         // Get Product from DB
         Product productFromDB = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productID", productId));

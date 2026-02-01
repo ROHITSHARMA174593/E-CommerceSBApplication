@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
+import org.springframework.lang.NonNull;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -36,7 +37,7 @@ public class JwtUtils {
 
 
     //todo :Now get JWT from Cookies
-    public String getJwtFromCookies(HttpServletRequest request){
+    public String getJwtFromCookies(@NonNull HttpServletRequest request){
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if(cookie != null){
 //            System.out.println("Cookie : "+ cookie.getValue());
@@ -46,7 +47,7 @@ public class JwtUtils {
         }
     }
 
-    public String getJwtFromHeader(HttpServletRequest request){
+    public String getJwtFromHeader(@NonNull HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
         if(bearerToken != null && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);

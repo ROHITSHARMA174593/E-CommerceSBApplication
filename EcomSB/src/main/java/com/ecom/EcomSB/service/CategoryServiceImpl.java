@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     //todo : Easy Method for Deletion
     @Override
-    public CategoryDTO deleteCategory(Long categoryId) {
+    public CategoryDTO deleteCategory(@NonNull Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category ", "CategoryID", categoryId));
 
@@ -96,7 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO, @NonNull Long categoryId) {
 
         Category savedCategory = categoryRepository
                 .findById(categoryId)

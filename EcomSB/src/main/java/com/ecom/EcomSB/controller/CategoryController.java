@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 import com.ecom.EcomSB.service.CategoryService;
 
 
@@ -61,7 +62,7 @@ public class CategoryController {
 
     @Tag(name = "Category APIs", description = "APIs for Managing Category")
     @DeleteMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> deleteCategory(@Parameter(description = "Category that you wish to create") @PathVariable Long categoryId) {
+    public ResponseEntity<CategoryDTO> deleteCategory(@Parameter(description = "Category that you wish to create") @PathVariable @NonNull Long categoryId) {
         CategoryDTO deletedCategory = categoryService.deleteCategory(categoryId);
          return new ResponseEntity<>(deletedCategory, HttpStatus.OK);
         // return ResponseEntity.ok(status);
@@ -75,7 +76,7 @@ public class CategoryController {
     // todo : We can also write this
     //      @RequestMapping(value = "/api/public/categories/{categoryId}", method = RequestMethod.PUT)
     public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO,
-                                                      @PathVariable Long categoryId) {
+                                                      @PathVariable @NonNull Long categoryId) {
         CategoryDTO savedCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
         return new ResponseEntity<>(savedCategoryDTO, HttpStatus.OK);
     }

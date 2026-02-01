@@ -9,6 +9,7 @@ import com.ecom.EcomSB.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public AddressDTO getAddressById(Long addressId) {
+    public AddressDTO getAddressById(@NonNull Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
 
@@ -63,7 +64,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
+    public AddressDTO updateAddress(@NonNull Long addressId, AddressDTO addressDTO) {
         Address addressFromDB = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
         addressFromDB.setCity(addressDTO.getCity());
         addressFromDB.setPincode(addressDTO.getPincode());
@@ -82,7 +83,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public String deleteAddressById(Long addressId) {
+    public String deleteAddressById(@NonNull Long addressId) {
         Address addressFromDB = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
 

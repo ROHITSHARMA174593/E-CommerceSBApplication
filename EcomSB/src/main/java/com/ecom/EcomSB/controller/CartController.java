@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class CartController {
 
     @Tag(name = "Cart APIs", description = "APIs for Managing Cart")
     @PostMapping("/carts/products/{productId}/quantity/{quantity}")
-    public ResponseEntity<CartDTO> addProductToCart(@PathVariable Long productId,
+    public ResponseEntity<CartDTO> addProductToCart(@PathVariable @NonNull Long productId,
                                                     @PathVariable Integer quantity){
         CartDTO cartDTO = cartService.addProductToCart(productId, quantity);
         return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.CREATED);
@@ -53,7 +54,7 @@ public class CartController {
 
     @Tag(name = "Cart APIs", description = "APIs for Managing Cart")
     @PutMapping("/cart/products/{productId}/quantity/{operation}")
-    public ResponseEntity<CartDTO> updateCartProduct(@PathVariable Long productId,
+    public ResponseEntity<CartDTO> updateCartProduct(@PathVariable @NonNull Long productId,
                                                      @PathVariable String operation) {
 
         CartDTO cartDTO = cartService.updateProductQuantityInCart(productId,
@@ -64,8 +65,8 @@ public class CartController {
 
     @Tag(name = "Cart APIs", description = "APIs for Managing Cart")
     @DeleteMapping("/carts/{cartId}/product/{productId}")
-    public ResponseEntity<String> deleteProductFromCart(@PathVariable Long cartId,
-                                                        @PathVariable Long productId) {
+    public ResponseEntity<String> deleteProductFromCart(@PathVariable @NonNull Long cartId,
+                                                        @PathVariable @NonNull Long productId) {
         String status = cartService.deleteProductFromCart(cartId, productId);
 
         return new ResponseEntity<String>(status, HttpStatus.OK);

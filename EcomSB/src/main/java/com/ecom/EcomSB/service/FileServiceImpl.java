@@ -2,6 +2,7 @@ package com.ecom.EcomSB.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.lang.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,13 +14,16 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService{
 
     @Override
-    public String uploadImage(String path, MultipartFile file) throws IOException {
+    public String uploadImage(String path, @NonNull MultipartFile file) throws IOException {
         // File name of the current/original file
         String originalFileName = file.getOriginalFilename();
 
         // Generate a unique file name
         String randomID = UUID.randomUUID().toString();
         // basic explination ::: filename = abcd.jpg -> UUID = 1234 --> your file name will be(fileName) 1234.jpg
+        if (originalFileName == null) {
+             throw new IOException("Original file name is null");
+        }
         String fileName = randomID.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
 
         // explination :: path that we send from method ("/imagedir") + File.separator(ye ek "/" add kar dega beeche me vaise to hum direct "/" bhi likh sakte the lekin vo only ek specific OS per hi kaam karta hai jaise windows per "/" chal jaata hai lekin  linux per "/" kaam nahi karta isliye inbuilt functionality use kar li) + fileName(yaha per UUID + extension aa rhi hai humaare pass)

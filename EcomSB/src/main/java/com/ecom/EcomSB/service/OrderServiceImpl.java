@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public OrderDTO placeOrder(String emailId, Long addressId, String paymentMethod, String pgName, String pgPaymentId, String pgStatus, String pgResponseMessage) {
+    public OrderDTO placeOrder(String emailId, @NonNull Long addressId, String paymentMethod, String pgName, String pgPaymentId, String pgStatus, String pgResponseMessage) {
         // Getting User Cart
         Cart cart = cartRepository.findCartByEmail(emailId);
         if(cart == null)

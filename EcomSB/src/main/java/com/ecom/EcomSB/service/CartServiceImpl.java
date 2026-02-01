@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class CartServiceImpl implements CartService{
     ModelMapper modelMapper;
 
     @Override
-    public CartDTO addProductToCart(Long productId, Integer quantity) {
+    public CartDTO addProductToCart(@NonNull Long productId, Integer quantity) {
         Cart cart  = createCart();
 
         Product product = productRepository.findById(productId)
@@ -152,7 +153,7 @@ public class CartServiceImpl implements CartService{
 
     @Transactional
     @Override
-    public CartDTO updateProductQuantityInCart(Long productId, Integer quantity) {
+    public CartDTO updateProductQuantityInCart(@NonNull Long productId, Integer quantity) {
 
         String emailId = authUtil.loggedInEmail();
         Cart userCart = cartRepository.findCartByEmail(emailId);
@@ -246,7 +247,7 @@ public class CartServiceImpl implements CartService{
 
     @Transactional
     @Override
-    public String deleteProductFromCart(Long cartId, Long productId) {
+    public String deleteProductFromCart(@NonNull Long cartId, @NonNull Long productId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
 
@@ -266,7 +267,7 @@ public class CartServiceImpl implements CartService{
 
 
     @Override
-    public void updateProductInCarts(Long cartId, Long productId) {
+    public void updateProductInCarts(@NonNull Long cartId, @NonNull Long productId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
 
