@@ -17,6 +17,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.lang.NonNull;
+import com.ecom.EcomSB.payload.CartItemRequest;
+import com.ecom.EcomSB.payload.CartDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +44,13 @@ public class CartServiceImpl implements CartService{
 
     @Autowired
     ModelMapper modelMapper;
+
+    @org.springframework.beans.factory.annotation.Value("${image.base.url}")
+    private String imageBaseUrl;
+
+    private String constructImageUrl(String imageName){
+        return imageBaseUrl.endsWith("/") ? imageBaseUrl + imageName : imageBaseUrl+ "/"+imageName;
+    }
 
     @Override
     public CartDTO addProductToCart(@NonNull Long productId, Integer quantity) {
@@ -95,6 +104,7 @@ public class CartServiceImpl implements CartService{
 
         Stream<ProductDTO> productStream = cartItems.stream().map(item -> {
             ProductDTO map = modelMapper.map(item.getProduct(), ProductDTO.class);
+            map.setImage(constructImageUrl(item.getProduct().getImage()));
             map.setQuantity(item.getQuantity());
             return map;
         });
@@ -121,6 +131,7 @@ public class CartServiceImpl implements CartService{
             List<ProductDTO> products = cart.getCartItems().stream()
                     .map(p -> {
                         ProductDTO dto = modelMapper.map(p.getProduct(), ProductDTO.class);
+                        dto.setImage(constructImageUrl(p.getProduct().getImage()));
                         logger.info("Mapped Product: {}", dto.getProductName());
                         return dto;
                     }).collect(Collectors.toList());
@@ -145,7 +156,11 @@ public class CartServiceImpl implements CartService{
         cart.getCartItems().forEach(c ->
                 c.getProduct().setQuantity(c.getQuantity()));
         List<ProductDTO> products = cart.getCartItems().stream()
-                .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                .map(p -> {
+                    ProductDTO dto = modelMapper.map(p.getProduct(), ProductDTO.class);
+                    dto.setImage(constructImageUrl(p.getProduct().getImage()));
+                    return dto;
+                })
                 .toList();
         cartDTO.setProducts(products);
         return cartDTO;
@@ -219,6 +234,7 @@ public class CartServiceImpl implements CartService{
 
         Stream<ProductDTO> productStream = cartItems.stream().map(item -> {
             ProductDTO prd = modelMapper.map(item.getProduct(), ProductDTO.class);
+            prd.setImage(constructImageUrl(item.getProduct().getImage()));
             prd.setQuantity(item.getQuantity());
             return prd;
         });
@@ -291,4 +307,68 @@ public class CartServiceImpl implements CartService{
         cartItem = cartItemRepository.save(cartItem);
     }
 
+    @Transactional
+    @Override
+    public CartDTO createCartFromList(List<com.ecom.EcomSB.payload.CartItemRequest> cartItems) {
+        Cart cart = createCart();
+        Long cartId = cart.getCartId();
+
+        for (com.ecom.EcomSB.payload.CartItemRequest itemRequest : cartItems) {
+            Long productId = itemRequest.getProductId();
+            Integer quantity = itemRequest.getQuantity();
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+            CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+
+            if (cartItem == null) {
+                // Not in cart, add it
+                if (product.getQuantity() > 0) {
+                     CartItem newCartItem = new CartItem();
+                     newCartItem.setProduct(product);
+                     newCartItem.setCart(cart);
+                     newCartItem.setQuantity(quantity);
+                     newCartItem.setDiscount(product.getDiscount());
+                     newCartItem.setProductPrice(product.getSpecialPrice());
+                     
+                     cartItemRepository.save(newCartItem);
+                     cart.getCartItems().add(newCartItem);
+                     
+                     cart.setTotalPrice(cart.getTotalPrice() + (product.getSpecialPrice() * quantity));
+                }
+            } else {
+                // Already in cart, update quantity? Or leave it?
+                // For sync, maybe we ensure at least this quantity or overwrite?
+                // Frontend sends "sync", let's overwite/add logic if needed.
+                // for now, let's just ignore if already exists to avoid duplication error,
+                // or we could update quantity. Use safer approach: if exists, do nothing (assume backend is truth or already synced)
+                // OR better: update quantity to match request (sync)
+                // Let's safe update:
+                 /*
+                double oldPrice = cartItem.getProductPrice() * cartItem.getQuantity();
+                cartItem.setQuantity(quantity);
+                cartItem.setProductPrice(product.getSpecialPrice());
+                cartItemRepository.save(cartItem);
+                
+                cart.setTotalPrice(cart.getTotalPrice() - oldPrice + (product.getSpecialPrice() * quantity));
+                */
+            }
+        }
+        
+        cartRepository.save(cart);
+
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+        List<ProductDTO> products = cart.getCartItems().stream()
+                .map(p -> {
+                    ProductDTO dto = modelMapper.map(p.getProduct(), ProductDTO.class);
+                    dto.setImage(constructImageUrl(p.getProduct().getImage()));
+                    dto.setQuantity(p.getQuantity()); // Ensure quantity is set in response
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        cartDTO.setProducts(products);
+
+        return cartDTO;
+    }
 }

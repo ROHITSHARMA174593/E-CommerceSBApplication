@@ -52,6 +52,21 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
+    @Tag(name = "Product APIs", description = "APIs for Managing Product")
+    @GetMapping("/admin/products")
+    public ResponseEntity<ProductResponse> getAllProductsAdmin(
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_PRODUCTS_BY) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR) String sortOrder
+    ){
+        ProductResponse productResponse = productService.getAllProducts(keyword, category, pageNumber, pageSize, sortBy, sortOrder);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+
     //todo : Fetch Product By Category
     @Tag(name = "Product APIs", description = "APIs for Managing Product")
     @GetMapping("/public/categories/{categoryId}/products")

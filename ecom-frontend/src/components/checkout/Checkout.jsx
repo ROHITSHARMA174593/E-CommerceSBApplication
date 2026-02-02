@@ -2,7 +2,7 @@ import { Button, Step, StepLabel, Stepper } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import AddressInfo from './AddressInfo';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserAddresses } from '../../store/actions';
+import { getUserAddresses, selectUserCheckoutAddress } from '../../store/actions';
 import toast from 'react-hot-toast';
 import Skeleton from '../shared/Skeleton';
 import ErrorPage from '../shared/ErrorPage';
@@ -49,6 +49,12 @@ const Checkout = () => {
     useEffect(() => {
         dispatch(getUserAddresses());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (activeStep === 0 && address && address.length > 0 && !selectedUserCheckoutAddress) {
+            dispatch(selectUserCheckoutAddress(address[0]));
+        }
+    }, [address, activeStep, selectedUserCheckoutAddress, dispatch]);
 
   return (
     <div className='py-14 min-h-[calc(100vh-100px)]'>

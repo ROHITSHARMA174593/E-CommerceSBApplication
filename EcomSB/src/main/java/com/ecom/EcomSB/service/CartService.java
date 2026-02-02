@@ -1,6 +1,7 @@
 package com.ecom.EcomSB.service;
 
 import com.ecom.EcomSB.payload.CartDTO;
+import com.ecom.EcomSB.payload.CartItemRequest;
 import org.springframework.lang.NonNull;
 
 import jakarta.transaction.Transactional;
@@ -20,4 +21,6 @@ public interface CartService {
     String deleteProductFromCart(@NonNull Long cartId, @NonNull Long productId);
 
     void updateProductInCarts(@NonNull Long cartId, @NonNull Long productId);
+
+    CartDTO createCartFromList(List<CartItemRequest> cartItems);
 }

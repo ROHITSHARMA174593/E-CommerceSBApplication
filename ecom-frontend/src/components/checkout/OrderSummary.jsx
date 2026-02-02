@@ -49,9 +49,7 @@ const OrderSummary = ({ totalPrice, cart, address, paymentMethod}) => {
             <div className='space-y-2'>
                 {cart?.map((item) => (
                     <div key={item?.productId} className='flex items-center'>
-                        <img src={`${import.meta.env.VITE_BACK_END_URL}/images/${
-                            item?.image
-                        }`}
+                        <img src={item?.image}
                         alt='Product'
                         className='w-12 h-12 rounded-sm'></img>
                     <div className='text-gray-500'>

@@ -22,6 +22,12 @@ const PaymentMethod = () => {
         }
     }, [dispatch, cartId]);
 
+    useEffect(() => {
+        if (!paymentMethod) {
+            dispatch(addPaymentMethod("Stripe"));
+        }
+    }, [dispatch, paymentMethod]);
+
     const paymentMethodHandler = (method) => {
         dispatch(addPaymentMethod(method));
     }

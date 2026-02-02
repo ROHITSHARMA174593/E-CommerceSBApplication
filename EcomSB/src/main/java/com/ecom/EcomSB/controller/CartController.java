@@ -36,6 +36,14 @@ public class CartController {
     }
 
     @Tag(name = "Cart APIs", description = "APIs for Managing Cart")
+    @PostMapping("/cart/create")
+    public ResponseEntity<CartDTO> createCart(@RequestBody List<com.ecom.EcomSB.payload.CartItemRequest> cartItems){
+        CartDTO cartDTO = cartService.createCartFromList(cartItems);
+        return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.CREATED);
+    }
+
+
+    @Tag(name = "Cart APIs", description = "APIs for Managing Cart")
     @GetMapping("/carts")
     public ResponseEntity<List<CartDTO>> getCarts() {
         List<CartDTO> cartDTOs = cartService.getAllCarts();

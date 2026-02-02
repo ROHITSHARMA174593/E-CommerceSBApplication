@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import HeroBanner from "./HeroBanner";
 import { useEffect } from "react";
@@ -40,12 +41,19 @@ const Home = () => {
                         </span>
                     </div>
                 ) : (
+                    <>
             <div className="pb-6 pt-14 grid 2xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 gap-y-6 gap-x-6">
                        {products && 
                        products?.slice(0,4)
                                 .map((item, i) => <ProductCard key={i} {...item} />
                         )}
                     </div>
+                    <div className="flex justify-center mt-4">
+                        <Link to="/products" className="px-6 py-3 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-700 transition duration-300">
+                            View More Products
+                        </Link>
+                    </div>
+                    </>
                     )}
             </div>
         </div>
